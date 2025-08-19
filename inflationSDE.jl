@@ -10,7 +10,8 @@ function makeDriftAndVolFunc(
     AMinus = additionalParams["AMinus"]
     phi0 = additionalParams["phi0"]
     sigma = additionalParams["sigma"]
-    return makeDriftAndVolFuncStarobinsky(potFunc, potDerFunc, phiEnd, APlus, AMinus, phi0, sigma)
+    h0 = additionalParams["h0"]
+    return makeDriftAndVolFuncStarobinsky(potFunc, potDerFunc, phiEnd, APlus, AMinus, phi0, sigma, h0)
   end
 
   if endCond == "Epsilon"
@@ -75,7 +76,7 @@ function makeDriftAndVolFunc(
 
 end
 
-function makeDriftAndVolFuncStarobinsky(potFunc, potDerFunc, phiEnd, APlus, AMinus, phi0, sigma)
+function makeDriftAndVolFuncStarobinsky(potFunc, potDerFunc, phiEnd, APlus, AMinus, phi0, sigma, h0)
 
   function drift!(driftVec, u, p, t)
     nInf = div(size(u)[1], 2)
@@ -97,8 +98,7 @@ function makeDriftAndVolFuncStarobinsky(potFunc, potDerFunc, phiEnd, APlus, AMin
   infPSFunc = (N, u) -> begin
     infl = u[1]
     vel = u[2]
-    h = Hubble(potFunc(infl), vel)
-    return infl > phi0 ? (h / (2 * pi))^2 : PInflatonStarobinsky(h, APlus / AMinus, exp(N - u[3]), sigma)
+    return infl > phi0 ? (h0 / (2 * pi))^2 : PInflatonStarobinsky(h0, APlus / AMinus, exp(N - u[3]), sigma)
   end
 
   function vol!(volVec, u, p, t)
